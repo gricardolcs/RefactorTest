@@ -39,7 +39,7 @@ public class SatRecruitmentController {
             messageBody.getPhone(),
             errors);
 
-        if (errors != null && errors != "") {
+        if (responseError != null && responseError != "") {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errors);
         }
 

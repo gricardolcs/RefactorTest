@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import sat.recruitment.api.common.Constants;
 import sat.recruitment.api.model.User;
 import sat.recruitment.api.repository.UserRepository;
 
@@ -34,9 +35,8 @@ public class UserService {
         newUser.setUserType(user.getUserType());
         newUser.setMoney(user.getMoney());
 
-        normalUser(newUser);
-        superUser(newUser);
-        premiumUser(newUser);
+        processUser(newUser);
+
 
         saveFile();
         verifyDuplicate(newUser);
@@ -86,13 +86,12 @@ public class UserService {
             }
             fstream.close();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             logger.error("problemas en salvar archivo", e.getMessage());
         }
     }
 
-    public void normalUser(User newUser) {
-        if (newUser.getUserType().equals("Normal")) {
+    private void processUser(User newUser) {
+        if (newUser.getUserType().equals(Constants.NORMAl)) {
             if (Double.valueOf(newUser.getMoney()) > 100) {
                 Double percentage = Double.valueOf("0.12");
                 // If new user is normal and has more than USD100
@@ -107,23 +106,30 @@ public class UserService {
                 }
             }
         }
-    }
-    public void superUser(User newUser) {
+
         if (newUser.getUserType().equals("SuperUser")) {
-            if (Double.valueOf(newUser.getMoney()) > 100) {
-                Double percentage = Double.valueOf("0.20");
-                Double gif = Double.valueOf(newUser.getMoney()) * percentage;
-                newUser.setMoney(newUser.getMoney() + gif);
-            }
+            superUser(newUser);
         }
+        if (newUser.getUserType().equals("Premium")) {
+            premiumUser(newUser);
+        }
+
     }
 
-    public void premiumUser(User newUser){
-        if (newUser.getUserType().equals("Premium")) {
+    private void premiumUser(User newUser){
             if (Double.valueOf(newUser.getMoney()) > 100) {
                 Double gif = Double.valueOf(newUser.getMoney()) * 2;
                 newUser.setMoney(newUser.getMoney() + gif);
             }
         }
+
+    private void superUser(User newUser) {
+        if (Double.valueOf(newUser.getMoney()) > 100) {
+            Double percentage = Double.valueOf("0.20");
+            Double gif = Double.valueOf(newUser.getMoney()) * percentage;
+            newUser.setMoney(newUser.getMoney() + gif);
+        }
     }
+
+
 }
